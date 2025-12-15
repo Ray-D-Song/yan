@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"fmt"
@@ -7,9 +7,24 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cobra"
 )
 
-func main() {
+var port string
+
+var ServerCmd = &cobra.Command{
+	Use:   "server",
+	Short: "Start the web server",
+	Run: func(cmd *cobra.Command, args []string) {
+		startServer()
+	},
+}
+
+func init() {
+	ServerCmd.Flags().StringVarP(&port, "port", "p", ":8080", "Port to run the server on")
+}
+
+func startServer() {
 	r := gin.Default()
 
 	startTS := time.Now().Unix()
@@ -23,9 +38,9 @@ func main() {
 		c.String(http.StatusOK, fmt.Sprintf("Service has been running for %f days", days))
 	})
 
-	// Start server on port 8080 (default)
-	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
-	if err := r.Run(); err != nil {
+	// Start server on configured port
+	log.Printf("Starting server on %s", port)
+	if err := r.Run(port); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }
