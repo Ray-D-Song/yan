@@ -1,3 +1,4 @@
+// Package server provides the web server command for the Yan application.
 package server
 
 import (

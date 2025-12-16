@@ -1,3 +1,4 @@
+// Package router provides route registration functions for HTTP endpoints.
 package router
 
 import (

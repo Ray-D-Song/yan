@@ -1,3 +1,4 @@
+// Package service contains business logic and service layer implementations.
 package service
 
 import (

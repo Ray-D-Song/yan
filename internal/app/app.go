@@ -1,3 +1,4 @@
+// Package app provides the application initialization and dependency injection setup using Uber FX.
 package app
 
 import (

@@ -1,3 +1,4 @@
+// Package model contains data models and domain entities for the Yan application.
 package model
 
 import "time"

@@ -1,3 +1,4 @@
+// Package infra provides infrastructure components including configuration, database, logging, and routing.
 package infra
 
 type Config struct {

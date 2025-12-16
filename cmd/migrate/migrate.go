@@ -1,3 +1,4 @@
+// Package migrate provides database migration commands for the Yan application.
 package migrate
 
 import (

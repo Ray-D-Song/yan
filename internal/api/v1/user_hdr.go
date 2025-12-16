@@ -1,3 +1,4 @@
+// Package v1 provides HTTP handlers for API version 1 endpoints.
 package v1
 
 import (

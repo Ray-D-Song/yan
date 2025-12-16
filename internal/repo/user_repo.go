@@ -1,3 +1,4 @@
+// Package repo provides data access layer implementations for database operations.
 package repo
 
 import (
