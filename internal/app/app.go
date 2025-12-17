@@ -29,7 +29,8 @@ func New() *fx.App {
 			v1.NewUserHandler,
 		),
 		fx.Invoke(
-			RegisterRoutes,
+			RegisterRoutes,           // Register API routes first
+			infra.RegisterStaticFiles, // Register static files last
 			RegisterLifecycle,
 		),
 	)
