@@ -206,5 +206,8 @@ function getFilenameFromUrl(url: string): string | null {
 }
 
 function handleAuthError() {
-
+  // Clear all localStorage data
+  localStorage.clear()
+  // Redirect to root path
+  window.location.href = '/'
 }

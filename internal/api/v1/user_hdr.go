@@ -19,6 +19,18 @@ func NewUserHandler(userService service.UserService) *UserHandler {
 	}
 }
 
+// RegisterRoutes registers all user-related routes
+func (h *UserHandler) RegisterRoutes(g *gin.RouterGroup) {
+	users := g.Group("/users")
+	{
+		users.POST("/register", h.Register)
+		users.POST("/login", h.Login)
+		users.GET("/:id", h.GetUser)
+		users.PUT("/:id", h.UpdateProfile)
+		users.PUT("/:id/password", h.ChangePassword)
+	}
+}
+
 // RegisterRequest represents the registration request payload
 type RegisterRequest struct {
 	Username string `json:"username" binding:"required"`

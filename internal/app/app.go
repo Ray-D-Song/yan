@@ -2,6 +2,7 @@
 package app
 
 import (
+	"github.com/gin-gonic/gin"
 	v1 "github.com/ray-d-song/yan/internal/api/v1"
 	"github.com/ray-d-song/yan/internal/infra"
 	"github.com/ray-d-song/yan/internal/repo"
@@ -17,7 +18,8 @@ func New() *fx.App {
 			infra.LoadConfig,
 			infra.NewLogger,
 			infra.NewDB,
-			infra.NewRouter,
+			infra.NewGin,
+			infra.NewAPIV1Group,
 
 			// repo
 			repo.NewUserRepo,
@@ -29,10 +31,10 @@ func New() *fx.App {
 			v1.NewUserHandler,
 		),
 		fx.Invoke(
-			RegisterRoutes,           // Register API routes first
-			infra.RegisterStaticFiles, // Register static files last
 			RegisterLifecycle,
+			func(apiV1 *gin.RouterGroup, userHandler *v1.UserHandler) {
+				userHandler.RegisterRoutes(apiV1)
+			},
 		),
 	)
 }
-
