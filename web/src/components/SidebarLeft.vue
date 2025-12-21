@@ -6,8 +6,8 @@ import {
   Blocks,
   Calendar,
   Command,
+  Github,
   Home,
-  Inbox,
   MessageCircleQuestion,
   Search,
   Settings2,
@@ -15,11 +15,10 @@ import {
   Trash2,
 } from "lucide-vue-next"
 
-import NavFavorites from '@/components/NavFavorites.vue'
 import NavMain from '@/components/NavMain.vue'
 import NavSecondary from '@/components/NavSecondary.vue'
 import NavWorkspaces from '@/components/NavWorkspaces.vue'
-import TeamSwitcher from '@/components/TeamSwitcher.vue'
+import NavUser from '@/components/NavUser.vue'
 import {
   Sidebar,
   SidebarContent,
@@ -31,23 +30,11 @@ const props = defineProps<SidebarProps>()
 
 // This is sample data.
 const data = {
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: Command,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
+  user: {
+    name: "shadcn",
+    email: "m@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  },
   navMain: [
     {
       title: "Search",
@@ -65,12 +52,6 @@ const data = {
       icon: Home,
       isActive: true,
     },
-    {
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
-      badge: "10",
-    },
   ],
   navSecondary: [
     {
@@ -84,71 +65,14 @@ const data = {
       icon: Settings2,
     },
     {
-      title: "Templates",
-      url: "#",
-      icon: Blocks,
-    },
-    {
       title: "Trash",
       url: "#",
       icon: Trash2,
     },
     {
-      title: "Help",
+      title: "GitHub",
       url: "#",
-      icon: MessageCircleQuestion,
-    },
-  ],
-  favorites: [
-    {
-      name: "Project Management & Task Tracking",
-      url: "#",
-      emoji: "📊",
-    },
-    {
-      name: "Family Recipe Collection & Meal Planning",
-      url: "#",
-      emoji: "🍳",
-    },
-    {
-      name: "Fitness Tracker & Workout Routines",
-      url: "#",
-      emoji: "💪",
-    },
-    {
-      name: "Book Notes & Reading List",
-      url: "#",
-      emoji: "📚",
-    },
-    {
-      name: "Sustainable Gardening Tips & Plant Care",
-      url: "#",
-      emoji: "🌱",
-    },
-    {
-      name: "Language Learning Progress & Resources",
-      url: "#",
-      emoji: "🗣️",
-    },
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
+      icon: Github,
     },
   ],
   workspaces: [
@@ -264,11 +188,10 @@ const data = {
 <template>
   <Sidebar class="border-r-0" v-bind="props">
     <SidebarHeader>
-      <TeamSwitcher :teams="data.teams" />
+      <NavUser :user="data.user" />
       <NavMain :items="data.navMain" />
     </SidebarHeader>
     <SidebarContent>
-      <NavFavorites :favorites="data.favorites" />
       <NavWorkspaces :workspaces="data.workspaces" />
       <NavSecondary :items="data.navSecondary" class="mt-auto" />
     </SidebarContent>

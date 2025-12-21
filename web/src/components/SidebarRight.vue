@@ -3,7 +3,6 @@ import type { SidebarProps } from '@/components/ui/sidebar'
 
 import Calendars from '@/components/Calendars.vue'
 import DatePicker from '@/components/DatePicker.vue'
-import NavUser from '@/components/NavUser.vue'
 import {
   Sidebar,
   SidebarContent,
@@ -21,11 +20,7 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+
   calendars: [
     {
       name: "My Calendars",
@@ -48,9 +43,6 @@ const data = {
     class="sticky hidden lg:flex top-0 h-svh border-l"
     v-bind="props"
   >
-    <SidebarHeader class="h-16 border-b border-sidebar-border">
-      <NavUser :user="data.user" />
-    </SidebarHeader>
     <SidebarContent>
       <DatePicker />
       <SidebarSeparator class="mx-0" />
