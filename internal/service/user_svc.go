@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strings"
 
@@ -52,6 +53,10 @@ func NewUserService(userRepo repo.UserRepo) UserService {
 func (s *userService) GetByID(ctx context.Context, id int64) (*model.User, error) {
 	u, err := s.userRepo.GetByID(ctx, id)
 	if err != nil {
+		// Convert database error to user-friendly error
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrUserNotFound
+		}
 		return nil, err
 	}
 	if u == nil {
@@ -89,6 +94,11 @@ func (s *userService) Register(
 	}
 
 	if err := s.userRepo.Create(ctx, u); err != nil {
+		// Check for unique constraint violation (username or email already exists)
+		if strings.Contains(err.Error(), "UNIQUE constraint failed") ||
+			strings.Contains(err.Error(), "duplicate key") {
+			return nil, ErrUsernameExists
+		}
 		return nil, err
 	}
 
@@ -98,6 +108,10 @@ func (s *userService) Register(
 func (s *userService) Login(ctx context.Context, email, password string) (*model.User, error) {
 	u, err := s.userRepo.GetByEmail(ctx, strings.TrimSpace(email))
 	if err != nil {
+		// Don't expose whether user exists or not (security)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrInvalidCredentials
+		}
 		return nil, err
 	}
 	if u == nil {
@@ -125,6 +139,10 @@ func (s *userService) UpdateProfile(ctx context.Context, u *model.User) error {
 
 	existing, err := s.userRepo.GetByID(ctx, u.ID)
 	if err != nil {
+		// Convert database error to user-friendly error
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrUserNotFound
+		}
 		return err
 	}
 	if existing == nil {
@@ -145,6 +163,10 @@ func (s *userService) ChangePassword(
 
 	u, err := s.userRepo.GetByID(ctx, userID)
 	if err != nil {
+		// Convert database error to user-friendly error
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrUserNotFound
+		}
 		return err
 	}
 	if u == nil {

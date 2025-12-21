@@ -1,5 +1,5 @@
 import AuthLayout from "@/layouts/auth-layout"
-import { defineComponent } from "vue"
+import { defineComponent, reactive } from "vue"
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,8 +16,44 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { usersApi } from '@/api/users'
+import { isDev } from '@/lib/env'
+import { toast } from 'vue-sonner'
 
 export default defineComponent(() => {
+  const formData = reactive({
+    email: isDev ? 'test@example.com' : '',
+    password: isDev ? 'test123456' : '',
+    isSubmitting: false,
+  })
+
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault()
+
+    try {
+      formData.isSubmitting = true
+      const response = await usersApi.login({
+        email: formData.email,
+        password: formData.password,
+      })
+
+      // Store user info if needed
+      // localStorage.setItem('user', JSON.stringify(response.user))
+
+      // Success - show toast and redirect after 1 second
+      toast.success('Login successful! Redirecting...')
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 1000)
+    } catch (error) {
+      // Error - show alert
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      alert(`Login failed: ${errorMessage}`)
+    } finally {
+      formData.isSubmitting = false
+    }
+  }
+
   return () => (
     <AuthLayout>
       <div class={cn('flex flex-col gap-6')}>
@@ -29,7 +65,7 @@ export default defineComponent(() => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form>
+            <form onSubmit={handleSubmit}>
               <FieldGroup>
                 <Field>
                   <FieldLabel>
@@ -39,6 +75,7 @@ export default defineComponent(() => {
                     type="email"
                     placeholder="m@example.com"
                     required
+                    v-model={formData.email}
                   />
                 </Field>
                 <Field>
@@ -53,11 +90,15 @@ export default defineComponent(() => {
                       Forgot your password?
                     </a>
                   </div>
-                  <Input type="password" required />
+                  <Input
+                    type="password"
+                    required
+                    v-model={formData.password}
+                  />
                 </Field>
                 <Field>
-                  <Button type="submit">
-                    Login
+                  <Button type="submit" disabled={formData.isSubmitting}>
+                    {formData.isSubmitting ? 'Logging in...' : 'Login'}
                   </Button>
                   <FieldDescription class="text-center">
                     Don't have an account?
