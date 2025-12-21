@@ -89,7 +89,7 @@ async function fetcher<T = JsonValue>(...args: FetcherParams): Promise<T> {
       // Handle 401 Unauthorized - redirect to login page
       if (res.status === 401) {
         handleAuthError()
-        throw new Error('Unauthorized: Please login again')
+        throw new Error('Please login again')
       }
 
       // If HTTP status is not 2xx, treat it as an error.
@@ -208,6 +208,8 @@ function getFilenameFromUrl(url: string): string | null {
 function handleAuthError() {
   // Clear all localStorage data
   localStorage.clear()
-  // Redirect to root path
-  window.location.href = '/'
+  // Redirect to login page only if not already on it
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
+  }
 }

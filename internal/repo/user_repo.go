@@ -60,7 +60,35 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*model.User, e
 }
 
 func (r *userRepo) Create(ctx context.Context, u *model.User) error {
-	res, err := r.db.ExecContext(ctx, `
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	var hasAdmin bool
+	err = tx.Get(&hasAdmin, `SELECT EXISTS (
+		SELECT 1 FROM users WHERE is_admin = 1
+		FOR UPDATE
+	)`)
+
+	var isAdmin int
+	if !hasAdmin {
+		isAdmin = 1
+	} else {
+		isAdmin = u.IsAdmin
+	}
+
+	res, err := tx.ExecContext(ctx, `
 		INSERT INTO users (
 			username,
 			password_hash,
@@ -73,7 +101,7 @@ func (r *userRepo) Create(ctx context.Context, u *model.User) error {
 		u.PasswordHash,
 		u.Email,
 		u.Status,
-		u.IsAdmin,
+		isAdmin,
 	)
 	if err != nil {
 		return err

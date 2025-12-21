@@ -47,13 +47,13 @@ export default defineComponent(() => {
 
     // Validate password match
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match')
+      toast.error('Passwords do not match')
       return
     }
 
     // Validate password length
     if (formData.password.length < 6) {
-      alert('Password must be at least 6 characters long')
+      toast.error('Password must be at least 6 characters long')
       return
     }
 
@@ -71,9 +71,9 @@ export default defineComponent(() => {
         window.location.href = '/login'
       }, 1000)
     } catch (error) {
-      // Error - show alert
+      // Error - show toast
       const errorMessage = error instanceof Error ? error.message : String(error)
-      alert(`Registration failed: ${errorMessage}`)
+      toast.error(`Registration failed: ${errorMessage}`)
     } finally {
       formData.isSubmitting = false
     }

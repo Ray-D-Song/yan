@@ -37,8 +37,7 @@ export default defineComponent(() => {
         password: formData.password,
       })
 
-      // Store user info if needed
-      // localStorage.setItem('user', JSON.stringify(response.user))
+      localStorage.setItem('user', JSON.stringify(response.user))
 
       // Success - show toast and redirect after 1 second
       toast.success('Login successful! Redirecting...')
@@ -46,9 +45,9 @@ export default defineComponent(() => {
         window.location.href = '/'
       }, 1000)
     } catch (error) {
-      // Error - show alert
+      // Error - show toast
       const errorMessage = error instanceof Error ? error.message : String(error)
-      alert(`Login failed: ${errorMessage}`)
+      toast.error(`Login failed: ${errorMessage}`)
     } finally {
       formData.isSubmitting = false
     }
