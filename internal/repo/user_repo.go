@@ -65,7 +65,6 @@ func (r *userRepo) Create(ctx context.Context, u *model.User) error {
 		var hasAdmin bool
 		err := tx.Get(&hasAdmin, `SELECT EXISTS (
 		SELECT 1 FROM users WHERE is_admin = 1
-		FOR UPDATE
 	)`)
 		if err != nil {
 			return err

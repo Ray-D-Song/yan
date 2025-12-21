@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT NOT NULL UNIQUE,
   status INTEGER NOT NULL DEFAULT 1, -- 1 normal, 0 disable
   is_admin INTEGER NOT NULL DEFAULT 0, -- 1 true, 0 false
-  created_at TEXT NOT NULL DEFAULT (datetime ('now')),
-  updated_at TEXT NOT NULL DEFAULT (datetime ('now'))
+  created_at TIMESTAMP NOT NULL DEFAULT (datetime ('now')),
+  updated_at TIMESTAMP NOT NULL DEFAULT (datetime ('now'))
 );
 
