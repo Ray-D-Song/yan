@@ -56,6 +56,16 @@ export const usersApi = {
   },
 
   /**
+   * Logout current user
+   * POST /api/v1/users/logout
+   */
+  logout(): Promise<null> {
+    return fetcher<null>('/v1/users/logout', {
+      method: 'POST',
+    })
+  },
+
+  /**
    * Get user by ID
    * GET /api/v1/users/:id
    */

@@ -6,17 +6,17 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
+	"github.com/ray-d-song/yan/internal/infra"
 	"github.com/ray-d-song/yan/internal/mdw"
 	"github.com/ray-d-song/yan/internal/service"
 )
 
 type UserHandler struct {
 	userService service.UserService
-	store       sessions.Store
+	store       *infra.DBStore
 }
 
-func NewUserHandler(userService service.UserService, store sessions.Store) *UserHandler {
+func NewUserHandler(userService service.UserService, store *infra.DBStore) *UserHandler {
 	return &UserHandler{
 		userService: userService,
 		store:       store,

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   BadgeCheck,
   Bell,
@@ -28,6 +30,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { usersApi } from '@/api/users'
 
 const props = defineProps<{
   user: {
@@ -38,6 +51,28 @@ const props = defineProps<{
 }>()
 
 const { isMobile } = useSidebar()
+const router = useRouter()
+
+const showLogoutDialog = ref(false)
+const isLoggingOut = ref(false)
+
+const handleLogoutClick = () => {
+  showLogoutDialog.value = true
+}
+
+const handleLogoutConfirm = async () => {
+  try {
+    isLoggingOut.value = true
+    await usersApi.logout()
+    // Redirect to login page after successful logout
+    router.push('/login')
+  } catch (error) {
+    console.error('Logout failed:', error)
+  } finally {
+    isLoggingOut.value = false
+    showLogoutDialog.value = false
+  }
+}
 </script>
 
 <template>
@@ -105,7 +140,7 @@ const { isMobile } = useSidebar()
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem @click="handleLogoutClick">
             <LogOut />
             Log out
           </DropdownMenuItem>
@@ -113,4 +148,26 @@ const { isMobile } = useSidebar()
       </DropdownMenu>
     </SidebarMenuItem>
   </SidebarMenu>
+
+  <AlertDialog v-model:open="showLogoutDialog">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+        <AlertDialogDescription>
+          You will be redirected to the login page.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel :disabled="isLoggingOut">
+          Cancel
+        </AlertDialogCancel>
+        <AlertDialogAction
+          @click="handleLogoutConfirm"
+          :disabled="isLoggingOut"
+        >
+          {{ isLoggingOut ? 'Logging out...' : 'Log out' }}
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>

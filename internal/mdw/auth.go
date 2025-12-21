@@ -5,18 +5,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"github.com/ray-d-song/yan/internal/infra"
 	"github.com/ray-d-song/yan/internal/service"
 )
 
 const (
-	SessionName = "yan_session"
+	SessionName      = "yan_session"
 	SessionKeyUserID = "user_id"
 )
 
 // AuthMiddleware creates an authentication middleware
-func AuthMiddleware(store sessions.Store, userService service.UserService) gin.HandlerFunc {
+func AuthMiddleware(store *infra.DBStore, userService service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get session
 		session, err := store.Get(c.Request, SessionName)
@@ -58,7 +57,7 @@ func AuthMiddleware(store sessions.Store, userService service.UserService) gin.H
 
 // OptionalAuthMiddleware is like AuthMiddleware but doesn't abort if no auth
 // Useful for endpoints that work with or without authentication
-func OptionalAuthMiddleware(store sessions.Store, userService service.UserService) gin.HandlerFunc {
+func OptionalAuthMiddleware(store *infra.DBStore, userService service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Get session
 		session, err := store.Get(c.Request, SessionName)
