@@ -6,16 +6,20 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
+	"github.com/ray-d-song/yan/internal/mdw"
 	"github.com/ray-d-song/yan/internal/service"
 )
 
 type UserHandler struct {
 	userService service.UserService
+	store       sessions.Store
 }
 
-func NewUserHandler(userService service.UserService) *UserHandler {
+func NewUserHandler(userService service.UserService, store sessions.Store) *UserHandler {
 	return &UserHandler{
 		userService: userService,
+		store:       store,
 	}
 }
 
@@ -25,6 +29,7 @@ func (h *UserHandler) RegisterRoutes(g *gin.RouterGroup) {
 	{
 		users.POST("/register", h.Register)
 		users.POST("/login", h.Login)
+		users.POST("/logout", h.Logout)
 		users.GET("/:id", h.GetUser)
 		users.PUT("/:id", h.UpdateProfile)
 		users.PUT("/:id/password", h.ChangePassword)
@@ -96,7 +101,39 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// Create session
+	session, err := h.store.Get(c.Request, mdw.SessionName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "failed to create session")
+		return
+	}
+
+	session.Values[mdw.SessionKeyUserID] = user.ID
+	if err := session.Save(c.Request, c.Writer); err != nil {
+		c.String(http.StatusInternalServerError, "failed to save session")
+		return
+	}
+
 	c.JSON(http.StatusOK, user)
+}
+
+// Logout handles user logout
+// POST /api/v1/users/logout
+func (h *UserHandler) Logout(c *gin.Context) {
+	session, err := h.store.Get(c.Request, mdw.SessionName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "failed to get session")
+		return
+	}
+
+	// Set MaxAge to -1 to delete the session
+	session.Options.MaxAge = -1
+	if err := session.Save(c.Request, c.Writer); err != nil {
+		c.String(http.StatusInternalServerError, "failed to delete session")
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
 
 // GetUser retrieves a user by ID

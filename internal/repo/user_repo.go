@@ -5,8 +5,8 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ray-d-song/yan/internal/infra"
 	"github.com/ray-d-song/yan/internal/model"
+	"github.com/ray-d-song/yan/internal/utils"
 )
 
 type UserRepo interface {
@@ -61,7 +61,7 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*model.User, e
 }
 
 func (r *userRepo) Create(ctx context.Context, u *model.User) error {
-	return infra.WithTx(ctx, r.db, func(tx *sqlx.Tx) error {
+	return utils.WithTx(ctx, r.db, func(tx *sqlx.Tx) error {
 		var hasAdmin bool
 		err := tx.Get(&hasAdmin, `SELECT EXISTS (
 		SELECT 1 FROM users WHERE is_admin = 1
