@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/ray-d-song/yan/internal/infra"
 	"github.com/ray-d-song/yan/internal/model"
 )
 
@@ -60,35 +61,24 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*model.User, e
 }
 
 func (r *userRepo) Create(ctx context.Context, u *model.User) error {
-	tx, err := r.db.Beginx()
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if p := recover(); p != nil {
-			_ = tx.Rollback()
-			panic(p)
-		} else if err != nil {
-			_ = tx.Rollback()
-		} else {
-			err = tx.Commit()
-		}
-	}()
-
-	var hasAdmin bool
-	err = tx.Get(&hasAdmin, `SELECT EXISTS (
+	return infra.WithTx(ctx, r.db, func(tx *sqlx.Tx) error {
+		var hasAdmin bool
+		err := tx.Get(&hasAdmin, `SELECT EXISTS (
 		SELECT 1 FROM users WHERE is_admin = 1
 		FOR UPDATE
 	)`)
+		if err != nil {
+			return err
+		}
 
-	var isAdmin int
-	if !hasAdmin {
-		isAdmin = 1
-	} else {
-		isAdmin = u.IsAdmin
-	}
+		var isAdmin int
+		if !hasAdmin {
+			isAdmin = 1
+		} else {
+			isAdmin = u.IsAdmin
+		}
 
-	res, err := tx.ExecContext(ctx, `
+		res, err := tx.ExecContext(ctx, `
 		INSERT INTO users (
 			username,
 			password_hash,
@@ -97,23 +87,24 @@ func (r *userRepo) Create(ctx context.Context, u *model.User) error {
 			is_admin
 		) VALUES (?, ?, ?, ?, ?)
 	`,
-		u.Username,
-		u.PasswordHash,
-		u.Email,
-		u.Status,
-		isAdmin,
-	)
-	if err != nil {
-		return err
-	}
+			u.Username,
+			u.PasswordHash,
+			u.Email,
+			u.Status,
+			isAdmin,
+		)
+		if err != nil {
+			return err
+		}
 
-	id, err := res.LastInsertId()
-	if err != nil {
-		return err
-	}
+		id, err := res.LastInsertId()
+		if err != nil {
+			return err
+		}
 
-	u.ID = id
-	return nil
+		u.ID = id
+		return nil
+	})
 }
 
 func (r *userRepo) Update(ctx context.Context, u *model.User) error {
