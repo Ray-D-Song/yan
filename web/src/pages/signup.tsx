@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { usersApi } from '@/api/users'
 import { isDev } from '@/lib/env'
+import { toast } from 'vue-sonner'
 
 // Generate random test data for development
 function generateTestData() {
@@ -64,8 +65,11 @@ export default defineComponent(() => {
         password: formData.password,
       })
 
-      // Success - redirect to login page
-      window.location.href = '/login'
+      // Success - show toast and redirect after 1 second
+      toast.success('Registration successful! Redirecting to login...')
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 1000)
     } catch (error) {
       // Error - show alert
       const errorMessage = error instanceof Error ? error.message : String(error)
