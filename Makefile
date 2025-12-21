@@ -1,4 +1,4 @@
-.PHONY: build build-web build-server clean
+.PHONY: build build-web build-server clean dev
 
 # Variables
 BINARY_NAME=yan
@@ -45,3 +45,10 @@ clean:
 	rm -rf $(OUTPUT_DIR)
 	cd $(WEB_DIR) && rm -rf dist
 	@echo "Clean completed"
+
+# Development mode (run both web and server in dev mode)
+dev:
+	@echo "Starting development servers..."
+	@cd $(WEB_DIR) && pnpm dev & \
+	CGO_ENABLED=$(CGO) go run $(GO_MAIN) & \
+	wait
