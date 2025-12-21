@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@codemirror/language-data": "^6.5.2",
+    "@internationalized/date": "^3.10.1",
     "@milkdown/core": "^7.17.3",
     "@milkdown/crepe": "^7.16.0",
     "@milkdown/kit": "^7.16.0",
