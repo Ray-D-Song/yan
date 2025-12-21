@@ -60,24 +60,21 @@ type ChangePasswordRequest struct {
 func (h *UserHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := h.userService.Register(c.Request.Context(), req.Username, req.Password, req.Email)
 	if err != nil {
 		if err == service.ErrUsernameExists {
-			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			c.String(http.StatusConflict, err.Error())
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "User registered successfully",
-		"user":    user,
-	})
+	c.JSON(http.StatusCreated, user)
 }
 
 // Login handles user login
@@ -85,24 +82,21 @@ func (h *UserHandler) Register(c *gin.Context) {
 func (h *UserHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := h.userService.Login(c.Request.Context(), req.Email, req.Password)
 	if err != nil {
 		if err == service.ErrInvalidCredentials || err == service.ErrUserDisabled {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.String(http.StatusUnauthorized, err.Error())
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Login successful",
-		"user":    user,
-	})
+	c.JSON(http.StatusOK, user)
 }
 
 // GetUser retrieves a user by ID
@@ -111,23 +105,21 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		c.String(http.StatusBadRequest, "invalid user id")
 		return
 	}
 
 	user, err := h.userService.GetByID(c.Request.Context(), id)
 	if err != nil {
 		if err == service.ErrUserNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.String(http.StatusNotFound, err.Error())
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"user": user,
-	})
+	c.JSON(http.StatusOK, user)
 }
 
 // UpdateProfile updates user profile
@@ -136,23 +128,23 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		c.String(http.StatusBadRequest, "invalid user id")
 		return
 	}
 
 	var req UpdateProfileRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := h.userService.GetByID(c.Request.Context(), id)
 	if err != nil {
 		if err == service.ErrUserNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.String(http.StatusNotFound, err.Error())
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -164,14 +156,11 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 	}
 
 	if err := h.userService.UpdateProfile(c.Request.Context(), user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Profile updated successfully",
-		"user":    user,
-	})
+	c.JSON(http.StatusOK, user)
 }
 
 // ChangePassword changes user password
@@ -180,26 +169,24 @@ func (h *UserHandler) ChangePassword(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		c.String(http.StatusBadRequest, "invalid user id")
 		return
 	}
 
 	var req ChangePasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.String(http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := h.userService.ChangePassword(c.Request.Context(), id, req.NewPassword); err != nil {
 		if err == service.ErrUserNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.String(http.StatusNotFound, err.Error())
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Password changed successfully",
-	})
+	c.Status(http.StatusOK)
 }
