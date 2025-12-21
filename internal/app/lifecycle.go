@@ -10,7 +10,7 @@ import (
 
 func RegisterLifecycle(lc fx.Lifecycle, engine *gin.Engine) *http.Server {
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":18080",
 		Handler: engine,
 	}
 	lc.Append(fx.Hook{

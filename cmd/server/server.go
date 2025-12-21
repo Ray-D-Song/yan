@@ -17,7 +17,7 @@ var ServerCmd = &cobra.Command{
 }
 
 func init() {
-	ServerCmd.Flags().StringVarP(&port, "port", "p", ":8080", "Port to run the server on")
+	ServerCmd.Flags().StringVarP(&port, "port", "p", ":18080", "Port to run the server on")
 }
 
 func startServer() {

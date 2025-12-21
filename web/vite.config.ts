@@ -21,5 +21,13 @@ export default defineConfig({
   },
   build: {
     outDir: '../internal/embedfs/web/',
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:18080',
+        changeOrigin: true
+      }
+    }
   }
 })

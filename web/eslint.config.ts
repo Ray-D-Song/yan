@@ -19,10 +19,18 @@ export default defineConfigWithVueTs(
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
-  
+
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },
   ...pluginOxlint.configs['flat/recommended'],
+
+  {
+    rules: {
+      'unused-imports/no-unused-vars': 'off',
+      'no-console': 'off',
+      'no-alert': 'off',
+    },
+  },
 )

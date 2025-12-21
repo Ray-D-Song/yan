@@ -50,5 +50,5 @@ clean:
 dev:
 	@echo "Starting development servers..."
 	@cd $(WEB_DIR) && pnpm dev & \
-	CGO_ENABLED=$(CGO) go run $(GO_MAIN) & \
+	CGO_ENABLED=$(CGO) go run $(GO_MAIN) server & \
 	wait
