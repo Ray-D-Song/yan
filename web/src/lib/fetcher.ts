@@ -92,8 +92,9 @@ async function fetcher<T = JsonValue>(...args: FetcherParams): Promise<T> {
         throw new Error('Please login again')
       }
 
-      // If HTTP status is not 2xx, treat it as an error.
-      throw res.statusText
+      // For non-2xx responses, read the response body as text (error message)
+      const errorMessage = await res.text()
+      throw new Error(errorMessage || res.statusText)
     }
 
     // Handle 204 No Content (successful, but no body to parse).

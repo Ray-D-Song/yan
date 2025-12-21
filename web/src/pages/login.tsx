@@ -32,12 +32,12 @@ export default defineComponent(() => {
 
     try {
       formData.isSubmitting = true
-      const response = await usersApi.login({
+      const user = await usersApi.login({
         email: formData.email,
         password: formData.password,
       })
 
-      localStorage.setItem('user', JSON.stringify(response.user))
+      localStorage.setItem('user', JSON.stringify(user))
 
       // Success - show toast and redirect after 1 second
       toast.success('Login successful! Redirecting...')
