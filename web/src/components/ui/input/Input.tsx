@@ -9,8 +9,7 @@ interface InputProps {
 }
 
 export default defineComponent<InputProps & Omit<InputHTMLAttributes, 'class' | 'defaultValue' | 'modelValue'>>({
-  name: 'Input',
-  props: ['defaultValue', 'modelValue', 'class', 'type', 'placeholder', 'required', 'disabled', 'value'] as any,
+  props: ['defaultValue', 'modelValue', 'class', 'type', 'placeholder', 'required', 'disabled', 'value'],
   emits: ['update:modelValue'],
   setup(props, { emit, attrs }) {
     const state = reactive({
@@ -31,6 +30,10 @@ export default defineComponent<InputProps & Omit<InputHTMLAttributes, 'class' | 
 
     return () => (
       <input
+        type={props.type}
+        placeholder={props.placeholder}
+        required={props.required}
+        disabled={props.disabled}
         {...attrs}
         data-slot="input"
         class={cn(
