@@ -1,10 +1,11 @@
 package infra
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/base32"
-	"encoding/json"
+	"encoding/gob"
 	"net/http"
 	"strings"
 	"time"
@@ -88,11 +89,13 @@ func (s *DBStore) Save(r *http.Request, w http.ResponseWriter, session *sessions
 			), "=")
 	}
 
-	// Serialize session values
-	data, err := json.Marshal(session.Values)
-	if err != nil {
+	// Serialize session values using gob
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	if err := enc.Encode(session.Values); err != nil {
 		return err
 	}
+	data := buf.Bytes()
 
 	// Get user ID from session
 	userID, ok := session.Values["user_id"].(int64)
@@ -114,7 +117,7 @@ func (s *DBStore) Save(r *http.Request, w http.ResponseWriter, session *sessions
 		dbSession := &model.Session{
 			SessionID: session.ID,
 			UserID:    userID,
-			Data:      string(data),
+			Data:      base32.StdEncoding.EncodeToString(data),
 			ExpiresAt: expiresAt,
 		}
 		if err := s.repo.Create(r.Context(), dbSession); err != nil {
@@ -122,7 +125,7 @@ func (s *DBStore) Save(r *http.Request, w http.ResponseWriter, session *sessions
 		}
 	} else {
 		// Update existing session
-		existing.Data = string(data)
+		existing.Data = base32.StdEncoding.EncodeToString(data)
 		existing.ExpiresAt = expiresAt
 		if userID > 0 {
 			existing.UserID = userID
@@ -154,9 +157,15 @@ func (s *DBStore) load(ctx context.Context, session *sessions.Session) error {
 		return sql.ErrNoRows
 	}
 
-	// Deserialize session data
+	// Deserialize session data using gob
 	if dbSession.Data != "" {
-		if err := json.Unmarshal([]byte(dbSession.Data), &session.Values); err != nil {
+		data, err := base32.StdEncoding.DecodeString(dbSession.Data)
+		if err != nil {
+			return err
+		}
+		buf := bytes.NewBuffer(data)
+		dec := gob.NewDecoder(buf)
+		if err := dec.Decode(&session.Values); err != nil {
 			return err
 		}
 	}

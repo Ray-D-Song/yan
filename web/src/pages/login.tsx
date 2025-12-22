@@ -45,6 +45,7 @@ export default defineComponent(() => {
         window.location.href = '/'
       }, 1000)
     } catch (error) {
+      console.error(error)
       // Error - show toast
       const errorMessage = error instanceof Error ? error.message : String(error)
       toast.error(`Login failed: ${errorMessage}`)

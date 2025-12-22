@@ -89,7 +89,7 @@ async function fetcher<T = JsonValue>(...args: FetcherParams): Promise<T> {
       // Handle 401 Unauthorized - redirect to login page
       if (res.status === 401) {
         handleAuthError()
-        throw new Error('Please login again')
+        throw new Error(await res.text())
       }
 
       // For non-2xx responses, read the response body as text (error message)

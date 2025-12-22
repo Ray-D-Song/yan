@@ -2,6 +2,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -104,13 +105,15 @@ func (h *UserHandler) Login(c *gin.Context) {
 	// Create session
 	session, err := h.store.Get(c.Request, mdw.SessionName)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "failed to create session")
+		infra.Errorf("Failed to create session: %v", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("failed to create session: %v", err))
 		return
 	}
 
 	session.Values[mdw.SessionKeyUserID] = user.ID
 	if err := session.Save(c.Request, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "failed to save session")
+		infra.Errorf("Failed to save session for user %d: %v", user.ID, err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("failed to save session: %v", err))
 		return
 	}
 
@@ -122,14 +125,16 @@ func (h *UserHandler) Login(c *gin.Context) {
 func (h *UserHandler) Logout(c *gin.Context) {
 	session, err := h.store.Get(c.Request, mdw.SessionName)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "failed to get session")
+		infra.Errorf("Failed to get session during logout: %v", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("failed to get session: %v", err))
 		return
 	}
 
 	// Set MaxAge to -1 to delete the session
 	session.Options.MaxAge = -1
 	if err := session.Save(c.Request, c.Writer); err != nil {
-		c.String(http.StatusInternalServerError, "failed to delete session")
+		infra.Errorf("Failed to delete session: %v", err)
+		c.String(http.StatusInternalServerError, fmt.Sprintf("failed to delete session: %v", err))
 		return
 	}
 
