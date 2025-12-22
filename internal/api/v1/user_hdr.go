@@ -117,6 +117,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
+	infra.Infof("\v", user)
 	c.JSON(http.StatusOK, user)
 }
 

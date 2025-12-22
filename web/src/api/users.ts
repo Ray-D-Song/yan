@@ -15,20 +15,24 @@ export interface RegisterRequest {
   username: string
   password: string
   email: string
+  [key: string]: string
 }
 
 export interface LoginRequest {
   email: string
   password: string
+  [key: string]: string
 }
 
 export interface UpdateProfileRequest {
   username?: string
   email?: string
+  [key: string]: string | undefined
 }
 
 export interface ChangePasswordRequest {
   new_password: string
+  [key: string]: string
 }
 
 // API methods

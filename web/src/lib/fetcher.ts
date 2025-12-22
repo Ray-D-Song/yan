@@ -105,7 +105,7 @@ async function fetcher<T = JsonValue>(...args: FetcherParams): Promise<T> {
     const contentType = res.headers.get('Content-Type')
     if (!contentType)
       return res.text()
-    if (contentType === 'application/json') {
+    if (contentType.includes('application/json')) {
       return await res.json()
     }
     if (shouldDownloadAsFile(contentType)) {

@@ -1,5 +1,7 @@
 import { fetcher } from '../lib/fetcher'
 
+import type { JsonValue } from '../lib/types'
+
 // Note model
 export interface Note {
   id: number
@@ -29,6 +31,7 @@ export interface CreateNoteRequest {
   icon?: string | null
   is_favorite?: number
   position?: number
+  [key: string]: JsonValue
 }
 
 export interface UpdateNoteRequest {
@@ -39,10 +42,12 @@ export interface UpdateNoteRequest {
   is_favorite?: number
   position?: number
   status?: number
+  [key: string]: JsonValue
 }
 
 export interface UpdatePositionRequest {
   position: number
+  [key: string]: JsonValue
 }
 
 export interface ListNotesParams {
