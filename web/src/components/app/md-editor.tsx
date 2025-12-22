@@ -20,7 +20,7 @@ import { useEditor, Milkdown } from '@milkdown/vue'
 import "@milkdown/crepe/theme/common/style.css";
 
 import "@/style/milkdown/theme-frame.css"
-import { defineComponent } from 'vue'
+import { defineComponent, type PropType } from 'vue'
 
 const customLinkView = $view(linkSchema.mark, () => {
   const markViewConstructor: MarkViewConstructor = (mark) => {
@@ -73,14 +73,34 @@ const customLinkView = $view(linkSchema.mark, () => {
   return markViewConstructor
 })
 
-export default defineComponent(() => {
-  const mdContent = useLocalStorage('md-content', '')
+export default defineComponent({
+  props: {
+    id: {
+      type: [Number, String] as PropType<number | string | null>,
+      required: true
+    },
+    value: {
+      type: String,
+      required: true
+    },
+    onUpdateValue: {
+      type: Function as PropType<(value: string) => void>,
+      required: true
+    },
+  },
+  setup(props) {
+    const contentCache = props.id
+      ? useLocalStorage<{ content: string; updatedAt: string } | null>(
+          `content-cache-${props.id}`,
+          null
+        )
+      : { value: null }
 
-  useEditor((root) => {
-    const builder = new CrepeBuilder({
-      root,
-      defaultValue: mdContent.value,
-    })
+    useEditor((root) => {
+      const builder = new CrepeBuilder({
+        root,
+        defaultValue: props.value || contentCache.value?.content || '',
+      })
 
     // Add core features to match Crepe functionality
     builder
@@ -113,20 +133,28 @@ export default defineComponent(() => {
     // Add custom link view to the underlying editor
     builder.editor.use(customLinkView)
 
-    // Add markdown update listener
-    builder.editor.config((ctx) => {
-      const listener = ctx.get(listenerCtx)
-      listener.markdownUpdated((_, markdown) => {
-        mdContent.value = markdown
+      // Add markdown update listener
+      builder.editor.config((ctx) => {
+        const listener = ctx.get(listenerCtx)
+        listener.markdownUpdated((_, markdown) => {
+          props.onUpdateValue?.(markdown)
+
+          if (props.id && contentCache.value !== null) {
+            contentCache.value = {
+              content: markdown,
+              updatedAt: new Date().toISOString(),
+            }
+          }
+        })
       })
+
+      return builder
     })
 
-    return builder
-  })
-
-  return () => (
-    <section class={`relative`}>
-      <Milkdown />
-    </section>
-  )
+    return () => (
+      <section class={`relative`}>
+        <Milkdown />
+      </section>
+    )
+  },
 })

@@ -1,5 +1,4 @@
 import mainLayout from '@/layouts/main-layout'
-import edit from '@/pages/edit'
 import login from '@/pages/login'
 import signup from '@/pages/signup'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -18,12 +17,6 @@ const router = createRouter({
     {
       path: '/',
       component: mainLayout,
-      children: [
-        {
-          path: '/main',
-          component: edit
-        }
-      ]
     }
   ],
 })

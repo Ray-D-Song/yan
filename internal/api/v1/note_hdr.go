@@ -87,11 +87,11 @@ func (h *NoteHandler) CreateNote(c *gin.Context) {
 	}
 
 	if req.ParentID != nil {
-		note.ParentID = sql.NullInt64{Int64: *req.ParentID, Valid: true}
+		note.ParentID = model.NullInt64{NullInt64: sql.NullInt64{Int64: *req.ParentID, Valid: true}}
 	}
 
 	if req.Icon != nil {
-		note.Icon = sql.NullString{String: *req.Icon, Valid: true}
+		note.Icon = model.NullString{NullString: sql.NullString{String: *req.Icon, Valid: true}}
 	}
 
 	if err := h.noteService.Create(c.Request.Context(), note); err != nil {
@@ -250,11 +250,11 @@ func (h *NoteHandler) UpdateNote(c *gin.Context) {
 	}
 
 	if req.ParentID != nil {
-		note.ParentID = sql.NullInt64{Int64: *req.ParentID, Valid: true}
+		note.ParentID = model.NullInt64{NullInt64: sql.NullInt64{Int64: *req.ParentID, Valid: true}}
 	}
 
 	if req.Icon != nil {
-		note.Icon = sql.NullString{String: *req.Icon, Valid: true}
+		note.Icon = model.NullString{NullString: sql.NullString{String: *req.Icon, Valid: true}}
 	}
 
 	if err := h.noteService.Update(c.Request.Context(), note, userID); err != nil {

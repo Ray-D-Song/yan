@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Input } from '@/components/ui/input'
 import { toast } from 'vue-sonner'
+import { useRouter } from 'vue-router'
 
 const newNote = ref({
   visible: false,
@@ -93,6 +94,15 @@ onMounted(async () => {
   }
 })
 
+const router = useRouter()
+function handleClickItem(item: Note) {
+  router.push({
+    path: '/',
+    query: {
+      id: item.id
+    }
+  })
+}
 </script>
 
 <template>
@@ -102,7 +112,7 @@ onMounted(async () => {
       <SidebarMenu>
         <Collapsible v-for="workspace in workspaces" :key="workspace.id">
           <SidebarMenuItem>
-            <SidebarMenuButton as-child>
+            <SidebarMenuButton as-child @click="handleClickItem(workspace)">
               <a href="#">
                 <span v-if="workspace.icon">{{ workspace.icon }}</span>
                 <span>{{ workspace.title }}</span>
