@@ -3,12 +3,11 @@ package model
 import "time"
 
 type Session struct {
-	SessionID string    `db:"session_id" json:"session_id"`
-	UserID    int64     `db:"user_id" json:"user_id"`
+	BaseModel
+	SessionID string    `db:"session_id" json:"sessionId"`
+	UserID    int64     `db:"user_id" json:"userId"`
 	Data      string    `db:"data" json:"-"` // serialized session data
-	ExpiresAt time.Time `db:"expires_at" json:"expires_at"`
-	CreatedAt string    `db:"created_at" json:"created_at"`
-	UpdatedAt string    `db:"updated_at" json:"updated_at"`
+	ExpiresAt time.Time `db:"expires_at" json:"expiresAt"`
 }
 
 func (Session) TableName() string {

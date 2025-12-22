@@ -16,9 +16,9 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { usersApi } from '@/api/users'
 import { isDev } from '@/lib/env'
 import { toast } from 'vue-sonner'
+import { useUserInfo } from "@/hooks/use-user-info"
 
 export default defineComponent(() => {
   const formData = reactive({
@@ -27,17 +27,17 @@ export default defineComponent(() => {
     isSubmitting: false,
   })
 
+  const { login } = useUserInfo()
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault()
 
     try {
       formData.isSubmitting = true
-      const user = await usersApi.login({
+      await login({
         email: formData.email,
         password: formData.password,
       })
-
-      localStorage.setItem('user', JSON.stringify(user))
 
       // Success - show toast and redirect after 1 second
       toast.success('Login successful! Redirecting...')

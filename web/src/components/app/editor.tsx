@@ -72,7 +72,7 @@ const customLinkView = $view(linkSchema.mark, () => {
 })
 
 export default defineComponent(() => {
-  const mdContent = useLocalStorage('mdContent', '')
+  const mdContent = useLocalStorage('md-content', '')
 
 
   useEditor((root) => {

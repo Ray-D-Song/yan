@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
 import {
   BadgeCheck,
   Bell,
@@ -13,7 +12,6 @@ import {
 import {
   Avatar,
   AvatarFallback,
-  AvatarImage,
 } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -40,21 +38,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { usersApi } from '@/api/users'
-
-const props = defineProps<{
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}>()
+import { useUserInfo } from '@/hooks/use-user-info'
 
 const { isMobile } = useSidebar()
-const router = useRouter()
+const { userInfo, logout } = useUserInfo()
 
 const showLogoutDialog = ref(false)
 const isLoggingOut = ref(false)
+
+// Get initials from username for avatar fallback
+const userInitials = computed(() => {
+  if (!userInfo.value?.username) return 'U'
+
+  const words = userInfo.value.username.split(' ')
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
+  return userInfo.value.username.slice(0, 2).toUpperCase()
+})
 
 const handleLogoutClick = () => {
   showLogoutDialog.value = true
@@ -63,9 +64,8 @@ const handleLogoutClick = () => {
 const handleLogoutConfirm = async () => {
   try {
     isLoggingOut.value = true
-    await usersApi.logout()
-    // Redirect to login page after successful logout
-    router.push('/login')
+    await logout()
+    // logout() already handles redirect to login page
   } catch (error) {
     console.error('Logout failed:', error)
   } finally {
@@ -85,14 +85,13 @@ const handleLogoutConfirm = async () => {
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarImage :src="user.avatar" :alt="user.name" />
               <AvatarFallback class="rounded-lg">
-                CN
+                {{ userInitials }}
               </AvatarFallback>
             </Avatar>
             <div class="grid flex-1 text-left text-sm leading-tight">
-              <span class="truncate font-medium">{{ user.name }}</span>
-              <span class="truncate text-xs">{{ user.email }}</span>
+              <span class="truncate font-medium">{{ userInfo?.username }}</span>
+              <span class="truncate text-xs">{{ userInfo?.email }}</span>
             </div>
             <ChevronsUpDown class="ml-auto size-4" />
           </SidebarMenuButton>
@@ -106,14 +105,13 @@ const handleLogoutConfirm = async () => {
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
-                <AvatarImage :src="user.avatar" :alt="user.name" />
                 <AvatarFallback class="rounded-lg">
-                  CN
+                  {{ userInitials }}
                 </AvatarFallback>
               </Avatar>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-medium">{{ user.name }}</span>
-                <span class="truncate text-xs">{{ user.email }}</span>
+                <span class="truncate font-medium">{{ userInfo?.username }}</span>
+                <span class="truncate text-xs">{{ userInfo?.email }}</span>
               </div>
             </div>
           </DropdownMenuLabel>

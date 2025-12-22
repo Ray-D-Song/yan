@@ -2,13 +2,9 @@
 import type { SidebarProps } from '@/components/ui/sidebar'
 
 import {
-  AudioWaveform,
-  Blocks,
   Calendar,
-  Command,
   Github,
   Home,
-  MessageCircleQuestion,
   Search,
   Settings2,
   Sparkles,

@@ -6,8 +6,9 @@ export interface User {
   username: string
   email: string
   status: number
-  is_admin: number
-  created_at: string
+  isAdmin: number
+  createdAt: string
+  updatedAt: string
 }
 
 // Request types

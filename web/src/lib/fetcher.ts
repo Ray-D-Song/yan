@@ -15,7 +15,7 @@ type FetcherParams = [input: RequestInfo | URL, init?: FetcherOptions]
 /**
  * A robust fetch wrapper function.
  * This fetcher:
- * 1. Automatically injects the 'Authorization' header if a token exists in localStorage.
+ * 1. Uses session cookies for authentication (no token management needed).
  * 2. Allows passing custom fetch options (method, body, custom headers, etc.).
  * 3. Automatically JSON.stringifies object bodies if Content-Type is 'application/json'.
  * 4. Automatically removes 'Content-Type' for FormData to let the browser handle it.
@@ -30,26 +30,22 @@ async function fetcher<T = JsonValue>(...args: FetcherParams): Promise<T> {
   // 1. Separate the arguments: 'input' is the URL, 'init' is the options object.
   const [input, init = {}] = args
 
-  // 2. Retrieve the token from localStorage.
-  const token = localStorage.getItem('token')
-
-  // 3. Define default headers.
+  // 2. Define default headers.
   const defaultHeaders: HeadersInit = {
     // We assume JSON APIs by default.
-    'Organ-Code': localStorage.getItem('organ-code') || '',
     'Content-Type': 'application/json',
-    // If a token exists, automatically add the Authorization header.
-    ...(token && { Authorization: `${token}` }),
   }
 
-  // 4. Create base options without body first
+  // 3. Create base options without body first
   const { body, ...initWithoutBody } = init
 
-  // 5. Merge options:
+  // 4. Merge options:
   //    - User's 'init' options (like 'method', 'body') take precedence.
   //    - Headers need to be merged deeply.
+  //    - credentials: 'include' ensures cookies are sent with requests
   const finalOptions: RequestInit = {
     ...initWithoutBody, // User's options (e.g., method, credentials)
+    credentials: 'include', // Important: Send cookies with requests for session authentication
     headers: {
       ...defaultHeaders, // Our default headers
       ...(init.headers || {}), // User's custom headers (can override defaults)
@@ -207,8 +203,10 @@ function getFilenameFromUrl(url: string): string | null {
 }
 
 function handleAuthError() {
-  // Clear all localStorage data
+  // Clear user info from localStorage
+  // Session cookie will be cleared by the browser after logout
   localStorage.clear()
+
   // Redirect to login page only if not already on it
   if (window.location.pathname !== '/login') {
     window.location.href = '/login'

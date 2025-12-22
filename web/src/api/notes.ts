@@ -5,16 +5,16 @@ import type { JsonValue } from '../lib/types'
 // Note model
 export interface Note {
   id: number
-  parent_id: number | null
-  user_id: number
+  parentId: number | null
+  userId: number
   title: string
   content: string
   icon: string | null
-  is_favorite: number
+  isFavorite: number
   position: number
   status: number
-  created_at: string
-  updated_at: string
+  createdAt: string
+  updatedAt: string
 }
 
 // Note status constants
@@ -25,21 +25,21 @@ export const NoteStatus = {
 
 // Request types
 export interface CreateNoteRequest {
-  parent_id?: number | null
+  parentId?: number | null
   title: string
   content?: string
   icon?: string | null
-  is_favorite?: number
+  isFavorite?: number
   position?: number
   [key: string]: JsonValue
 }
 
 export interface UpdateNoteRequest {
-  parent_id?: number | null
+  parentId?: number | null
   title: string
   content?: string
   icon?: string | null
-  is_favorite?: number
+  isFavorite?: number
   position?: number
   status?: number
   [key: string]: JsonValue
@@ -51,7 +51,7 @@ export interface UpdatePositionRequest {
 }
 
 export interface ListNotesParams {
-  parent_id?: number | null | 'null'
+  parentId?: number | null | 'null'
   status?: number
   favorite?: boolean
 }
@@ -86,8 +86,8 @@ export const notesApi = {
   list(params?: ListNotesParams): Promise<Note[]> {
     const searchParams = new URLSearchParams()
 
-    if (params?.parent_id !== undefined) {
-      searchParams.append('parent_id', params.parent_id === null ? 'null' : String(params.parent_id))
+    if (params?.parentId !== undefined) {
+      searchParams.append('parent_id', params.parentId === null ? 'null' : String(params.parentId))
     }
 
     if (params?.status !== undefined) {

@@ -5,15 +5,14 @@ import "database/sql"
 type Note struct {
 	BaseModel
 	ID         int64          `db:"id" json:"id"`
-	ParentID   sql.NullInt64  `db:"parent_id" json:"parent_id"`
-	UserID     int64          `db:"user_id" json:"user_id"`
+	ParentID   sql.NullInt64  `db:"parent_id" json:"parentId"`
+	UserID     int64          `db:"user_id" json:"userId"`
 	Title      string         `db:"title" json:"title"`
 	Content    string         `db:"content" json:"content"`
 	Icon       sql.NullString `db:"icon" json:"icon"`
-	IsFavorite int            `db:"is_favorite" json:"is_favorite"` // 1 favorite, 0 not favorite
+	IsFavorite int            `db:"is_favorite" json:"isFavorite"` // 1 favorite, 0 not favorite
 	Position   int            `db:"position" json:"position"`
 	Status     int            `db:"status" json:"status"` // 1 normal, 0 trashed
-	CreatedAt  string         `db:"created_at" json:"created_at"`
 }
 
 const (
