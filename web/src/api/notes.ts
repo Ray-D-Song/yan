@@ -31,7 +31,7 @@ export interface CreateNoteRequest {
   icon?: string | null
   isFavorite?: number
   position?: number
-  [key: string]: JsonValue
+  [key: string]: JsonValue | undefined
 }
 
 export interface UpdateNoteRequest {
@@ -42,12 +42,12 @@ export interface UpdateNoteRequest {
   isFavorite?: number
   position?: number
   status?: number
-  [key: string]: JsonValue
+  [key: string]: JsonValue | undefined
 }
 
 export interface UpdatePositionRequest {
   position: number
-  [key: string]: JsonValue
+  [key: string]: JsonValue | undefined
 }
 
 export interface ListNotesParams {
@@ -104,6 +104,10 @@ export const notesApi = {
     return fetcher<Note[]>(url, {
       method: 'GET',
     })
+  },
+
+  listAll(): Promise<Note[]> {
+    return this.list()
   },
 
   /**

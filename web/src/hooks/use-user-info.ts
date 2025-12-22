@@ -1,7 +1,8 @@
 import { useLocalStorage } from '@vueuse/core'
 import { usersApi, type User, type LoginRequest, type RegisterRequest } from '@/api/users'
+import { type Ref } from 'vue'
 
-const userInfo = useLocalStorage('user-info', {})
+const userInfo = useLocalStorage('user-info', {}) as Ref<User | null>
 
 /**
  * Login with email and password

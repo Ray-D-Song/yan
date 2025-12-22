@@ -48,7 +48,7 @@ func (r *noteRepo) GetByID(ctx context.Context, id int64) (*model.Note, error) {
 }
 
 func (r *noteRepo) GetByUserID(ctx context.Context, userID int64, status int) ([]*model.Note, error) {
-	var notes []*model.Note
+	notes := make([]*model.Note, 0)
 	err := r.db.SelectContext(ctx, &notes, `
 		SELECT
 			id, parent_id, user_id, title, content,
@@ -65,7 +65,7 @@ func (r *noteRepo) GetByUserID(ctx context.Context, userID int64, status int) ([
 }
 
 func (r *noteRepo) GetByParentID(ctx context.Context, parentID sql.NullInt64, userID int64, status int) ([]*model.Note, error) {
-	var notes []*model.Note
+	notes := make([]*model.Note, 0)
 	var err error
 
 	if parentID.Valid {
@@ -96,7 +96,7 @@ func (r *noteRepo) GetByParentID(ctx context.Context, parentID sql.NullInt64, us
 }
 
 func (r *noteRepo) GetFavorites(ctx context.Context, userID int64) ([]*model.Note, error) {
-	var notes []*model.Note
+	notes := make([]*model.Note, 0)
 	err := r.db.SelectContext(ctx, &notes, `
 		SELECT
 			id, parent_id, user_id, title, content,

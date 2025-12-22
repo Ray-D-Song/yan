@@ -13,10 +13,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { RouterView } from 'vue-router'
+import { MilkdownProvider } from '@milkdown/vue'
 
 export default defineComponent({
   name: 'MainLayout',
-  setup(_, { slots }) {
+  setup(_) {
     return () => (
       <SidebarProvider>
         <SidebarLeft />
@@ -40,7 +42,9 @@ export default defineComponent({
             </div>
           </header>
           <div class="flex flex-1 flex-col gap-4 p-4">
-            {slots.default?.()}
+          <MilkdownProvider>
+            <RouterView />
+          </MilkdownProvider>
           </div>
         </SidebarInset>
         <SidebarRight />

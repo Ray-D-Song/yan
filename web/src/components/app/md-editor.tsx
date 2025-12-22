@@ -17,7 +17,9 @@ import { $view, insert } from '@milkdown/utils'
 import { useLocalStorage } from '@vueuse/core'
 import { useEditor, Milkdown } from '@milkdown/vue'
 
-import '@milkdown/crepe/theme/common/style.css'
+import "@milkdown/crepe/theme/common/style.css";
+
+import "@/style/milkdown/theme-frame.css"
 import { defineComponent } from 'vue'
 
 const customLinkView = $view(linkSchema.mark, () => {
@@ -74,7 +76,6 @@ const customLinkView = $view(linkSchema.mark, () => {
 export default defineComponent(() => {
   const mdContent = useLocalStorage('md-content', '')
 
-
   useEditor((root) => {
     const builder = new CrepeBuilder({
       root,
@@ -125,10 +126,6 @@ export default defineComponent(() => {
 
   return () => (
     <section class={`relative`}>
-      <input
-        placeholder="新页面"
-        class="[caret-width:3px] absolute left-60px top-40px z-20 h-48px border-none bg-transparent text-4xl text-black font-600 caret-blue-500 lg:left-180px lg:top-80px xl:left-240px xl:top-120px focus:border-none hover:border-none dark:text-gray-300 dark:caret-blue-400 focus:outline-none"
-      />
       <Milkdown />
     </section>
   )
