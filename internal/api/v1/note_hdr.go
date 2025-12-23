@@ -49,12 +49,17 @@ type CreateNoteRequest struct {
 // UpdateNoteRequest represents the update note request payload
 type UpdateNoteRequest struct {
 	ParentID   *int64  `json:"parent_id"`
-	Title      string  `json:"title" binding:"required"`
-	Content    string  `json:"content"`
+	Title      *string `json:"title"`
+	Content    *string `json:"content"`
 	Icon       *string `json:"icon"`
-	IsFavorite int     `json:"is_favorite"`
-	Position   int     `json:"position"`
-	Status     int     `json:"status"`
+	IsFavorite *int    `json:"is_favorite"`
+	Position   *int    `json:"position"`
+	Status     *int    `json:"status"`
+}
+
+// UpdateNoteResponse represents the update note response payload
+type UpdateNoteResponse struct {
+	UpdatedAt string `json:"updatedAt"`
 }
 
 // UpdatePositionRequest represents the update position request payload
@@ -240,21 +245,66 @@ func (h *NoteHandler) UpdateNote(c *gin.Context) {
 		return
 	}
 
+	// Get existing note to update only provided fields
+	existingNote, err := h.noteService.GetByID(c.Request.Context(), id, userID)
+	if err != nil {
+		if err == service.ErrNoteNotFound {
+			c.String(http.StatusNotFound, err.Error())
+			return
+		}
+		if err == service.ErrNoteUnauthorized {
+			c.String(http.StatusForbidden, err.Error())
+			return
+		}
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Update only provided fields
 	note := &model.Note{
-		ID:         id,
-		Title:      req.Title,
-		Content:    req.Content,
-		IsFavorite: req.IsFavorite,
-		Position:   req.Position,
-		Status:     req.Status,
+		ID:     id,
+		UserID: existingNote.UserID,
+		Status: existingNote.Status,
+	}
+
+	if req.Title != nil {
+		note.Title = *req.Title
+	} else {
+		note.Title = existingNote.Title
+	}
+
+	if req.Content != nil {
+		note.Content = *req.Content
+	} else {
+		note.Content = existingNote.Content
+	}
+
+	if req.IsFavorite != nil {
+		note.IsFavorite = *req.IsFavorite
+	} else {
+		note.IsFavorite = existingNote.IsFavorite
+	}
+
+	if req.Position != nil {
+		note.Position = *req.Position
+	} else {
+		note.Position = existingNote.Position
+	}
+
+	if req.Status != nil {
+		note.Status = *req.Status
 	}
 
 	if req.ParentID != nil {
 		note.ParentID = model.NullInt64{NullInt64: sql.NullInt64{Int64: *req.ParentID, Valid: true}}
+	} else {
+		note.ParentID = existingNote.ParentID
 	}
 
 	if req.Icon != nil {
 		note.Icon = model.NullString{NullString: sql.NullString{String: *req.Icon, Valid: true}}
+	} else {
+		note.Icon = existingNote.Icon
 	}
 
 	if err := h.noteService.Update(c.Request.Context(), note, userID); err != nil {
@@ -274,7 +324,9 @@ func (h *NoteHandler) UpdateNote(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, note)
+	c.JSON(http.StatusOK, UpdateNoteResponse{
+		UpdatedAt: note.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	})
 }
 
 // DeleteNote permanently deletes a note

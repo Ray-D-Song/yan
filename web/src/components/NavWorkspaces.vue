@@ -96,12 +96,7 @@ onMounted(async () => {
 
 const router = useRouter()
 function handleClickItem(item: Note) {
-  router.push({
-    path: '/',
-    query: {
-      id: item.id
-    }
-  })
+  router.push(`/edit/${item.id}`)
 }
 </script>
 

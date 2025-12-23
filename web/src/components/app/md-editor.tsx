@@ -20,7 +20,8 @@ import { useEditor, Milkdown } from '@milkdown/vue'
 import "@milkdown/crepe/theme/common/style.css";
 
 import "@/style/milkdown/theme-frame.css"
-import { defineComponent, type PropType } from 'vue'
+import { defineComponent, type PropType, watch } from 'vue'
+import { replaceAll } from '@milkdown/utils'
 
 const customLinkView = $view(linkSchema.mark, () => {
   const markViewConstructor: MarkViewConstructor = (mark) => {
@@ -96,7 +97,7 @@ export default defineComponent({
         )
       : { value: null }
 
-    useEditor((root) => {
+    const { get, loading } = useEditor((root) => {
       const builder = new CrepeBuilder({
         root,
         defaultValue: props.value || contentCache.value?.content || '',
@@ -149,6 +150,22 @@ export default defineComponent({
       })
 
       return builder
+    })
+
+    // Watch for value changes and update editor content
+    watch(() => props.value, (newValue) => {
+      if (loading.value) return
+
+      const editor = get()
+      if (!editor) return
+
+      // Get current editor content
+      const currentContent = editor.getMarkdown()
+
+      // Only update if content actually changed
+      if (currentContent !== newValue) {
+        editor.action(replaceAll(newValue))
+      }
     })
 
     return () => (
